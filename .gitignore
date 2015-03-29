@@ -1,0 +1,8 @@
+Paciente.rows.sql
+Paciente.mdb
+Paciente.db
+venv
+*.pyo
+*.pyc
+*.swo
+*.swp
