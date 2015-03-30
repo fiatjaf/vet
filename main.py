@@ -19,27 +19,33 @@ tables = {
 
 conn = engine.connect()
 
-@app.route('/<table>/<id>/', methods=['POST'])
-@app.route('/<table>/', methods=['POST'])
-def p(table, id=None):
-    table = tables[table]
+@app.route('/favicon.ico')
+def nothing():
+    return ''
+
+@app.route('/<table_name>/<id>/', methods=['POST'])
+@app.route('/<table_name>/', methods=['POST'])
+def p(table_name, id=None):
+    table = tables[table_name]
     if not id:
         o = conn.execute(table.insert(), **request.form)
     else:
         o = conn.execute(table.update(), **request.form)
     return render_template('raw.html', data=o)
 
-@app.route('/<table>/<id>/', methods=['GET'])
-@app.route('/<table>/', methods=['GET'])
-def g(table, id=None):
-    table = tables[table]
+@app.route('/<table_name>/<id>/', methods=['GET'])
+@app.route('/<table_name>/', methods=['GET'])
+def g(table_name, id=None):
+    table = tables[table_name]
     if id:
         pk = table.primary_key.columns.values()[0].description
         o = table.select(getattr(table.c, pk) == id).execute().first()
-        return render_template('raw.html', data=o)
+        return render_template('entity.html', entity=o)
     else:
         r = table.select().limit(20).execute().fetchall()
-        return render_template('raw.html', data=r)
+        return render_template('entities.html',
+                               rows=r,
+                               name=table_name.replace('-', ' '))
 
 if __name__ == '__main__':
     import sys
