@@ -6,3 +6,5 @@ venv
 *.pyc
 *.swo
 *.swp
+bin
+pyinstaller

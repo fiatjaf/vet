@@ -1,7 +1,8 @@
+#!/usr/bin/env python
+
 import json
 
 from flask import Flask, request, render_template
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Table, Column, Integer, String
 from sqlalchemy import create_engine, MetaData
 
@@ -41,4 +42,16 @@ def g(table, id=None):
         return render_template('raw.html', data=r)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
+        app.run(host='0.0.0.0')
+    else:
+        import webbrowser
+        import threading
+        import random
+
+        port = 5000 + random.randint(0, 999)
+        url = 'http://127.0.0.1:%s' % port
+
+        threading.Timer(1.25, lambda: webbrowser.open(url)).start()
+        app.run(port=port, debug=False)
