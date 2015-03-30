@@ -13,8 +13,12 @@ engine = create_engine('sqlite:///Paciente.db', convert_unicode=True)
 metadata = MetaData(bind=engine)
 
 tables = {
-  'cor': Table('COR', metadata, autoload=True),
-  'paciente': Table('PACIENTE', metadata, autoload=True),
+  'cores': Table('COR', metadata, autoload=True),
+  'pacientes': Table('PACIENTE', metadata, autoload=True),
+  'clientes': Table('CLIENTE', metadata, autoload=True),
+  'atendimentos': Table('ATENDIMENTO', metadata, autoload=True),
+  'vacinas-aplicadas': Table('VACINA APLICADA', metadata, autoload=True),
+  'vacinas-agendadas': Table('VACINA PLANEJADA', metadata, autoload=True)
 }
 
 conn = engine.connect()
@@ -40,6 +44,10 @@ def g(table, id=None):
     else:
         r = table.select().limit(20).execute().fetchall()
         return render_template('raw.html', data=r)
+
+@app.route('/')
+def index():
+    return render_template('list.html', list=tables, name="Tabelas")
 
 if __name__ == '__main__':
     import sys
