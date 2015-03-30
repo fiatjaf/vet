@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>{{ name }}</h1>
+<ul>
+{% for elem in list %}
+  <li><a href="/{{ elem }}/">{{ elem }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

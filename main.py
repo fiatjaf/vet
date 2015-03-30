@@ -29,7 +29,7 @@ def nothing():
 
 @app.route('/<table_name>/<id>/', methods=['POST'])
 @app.route('/<table_name>/', methods=['POST'])
-def p(table_name, id=None):
+def post(table_name, id=None):
     table = tables[table_name]
     if not id:
         o = conn.execute(table.insert(), **request.form)
@@ -39,17 +39,29 @@ def p(table_name, id=None):
 
 @app.route('/<table_name>/<id>/', methods=['GET'])
 @app.route('/<table_name>/', methods=['GET'])
-def g(table_name, id=None):
+def get(table_name, id=None):
     table = tables[table_name]
+    offset = request.args.get('from', 0)
+    limit = request.args.get('show', 20)
+
+    pk = table.primary_key.columns.keys()[0]
+    fk = {}
     if id:
-        pk = table.primary_key.columns.values()[0].description
         o = table.select(getattr(table.c, pk) == id).execute().first()
-        return render_template('entity.html', entity=o)
+        return render_template('entity.html',
+                               columns=table.columns.keys(),
+                               data=o,
+                               table_name=table_name,
+                               primary_key=pk,
+                               foreign_keys=fk)
     else:
-        r = table.select().limit(20).execute().fetchall()
+        r = table.select().offset(offset).limit(limit).execute().fetchall()
         return render_template('entities.html',
+                               columns=table.columns.keys(),
                                rows=r,
-                               name=table_name.replace('-', ' '))
+                               table_name=table_name,
+                               primary_key=pk,
+                               foreign_keys=fk)
 
 @app.route('/')
 def index():

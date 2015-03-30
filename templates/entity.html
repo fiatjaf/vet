@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1><a href="/">Início</a> / <a href="/{{ table_name }}/">{{ table_name | replace('-', ' ') | title }}</a> / {{ data[columns.index(primary_key)] }}</h1>
+
+<form method="post" action="/{{ table_name }}/{{ data[columns.index(primary_key)] }}/">
+  {% for item in data %}
+    <div>
+      <label>{{ columns[loop.index0] }}:</label>
+      <input name="{{ columns[loop.index0] }}" placeholder="{{ columns[loop.index0] }}" value="{{ item }}">
+    </div>
+  {% endfor %}
+  <button type="submit">Salvar</button>
+</form>
+
+{% endblock %}

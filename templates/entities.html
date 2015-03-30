@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1><a href="/">Início</a> / <a href="/{{ table_name }}/">{{ table_name | replace('-', ' ') | title }}</a></h1>
+
+<table>
+  <tr>
+    {% for name in columns %}<th>{{ name }}</th>{% endfor %}
+    {% for row in rows %}
+      <tr>
+      {% for item in row %}
+        <td>
+          <a href="/{{ table_name }}/{{ row[columns.index(primary_key)] }}">{{ item }}</a>
+        </td>{% endfor %}
+      </tr>
+    {% endfor %}
+  </tr>
+</table>
+
+{% endblock %}
