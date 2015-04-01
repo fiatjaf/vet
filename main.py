@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import json
+import os
+import sys
 
 from flask import Flask, request, render_template
 from sqlalchemy import Table, Column, Integer, String
@@ -9,7 +11,23 @@ from sqlalchemy import create_engine, MetaData
 app = Flask(__name__)
 app.debug = True
 
-engine = create_engine('sqlite:///Paciente.db', convert_unicode=True)
+print getattr(sys, 'frozen')
+if getattr(sys, 'frozen'):
+    print sys.executable
+    here = sys.executable
+else:
+    here = os.path.realpath(__file__)
+db = os.path.join(os.path.dirname(here), 'Paciente.db')
+
+print db
+print open(db)
+connstring = 'sqlite:///' + db
+print connstring
+
+engine = create_engine(connstring, convert_unicode=True)
+print engine
+print engine.__dict__
+
 metadata = MetaData(bind=engine)
 
 tables = {
@@ -68,16 +86,12 @@ def index():
     return render_template('list.html', list=tables, name="Tabelas")
 
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        app.run(host='0.0.0.0')
-    else:
-        import webbrowser
-        import threading
-        import random
+    import webbrowser
+    import threading
+    import random
 
-        port = 5000 + random.randint(0, 999)
-        url = 'http://127.0.0.1:%s' % port
+    port = 5000 + random.randint(0, 999)
+    url = 'http://127.0.0.1:%s' % port
 
-        threading.Timer(1.25, lambda: webbrowser.open(url)).start()
-        app.run(port=port, debug=False)
+    threading.Timer(1.45, lambda: webbrowser.open(url)).start()
+    app.run(port=port, debug=False)

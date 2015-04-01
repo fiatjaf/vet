@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 a = Analysis(['main.py'],
-             pathex=['/home/fiatjaf/comp/vet'],
+             pathex=['C:\\Users\\user\\vet'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)
@@ -8,11 +8,11 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='vet',
+          name='vet.exe',
           debug=False,
           strip=None,
           upx=True,
-          console=True , resources=['sqlitedll/sqlite.dll', 'sqlite.def'])
+          console=True )
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
