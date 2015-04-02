@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+import sqlite3
 
 from flask import Flask, request, render_template
 from sqlalchemy import Table, Column, Integer, String
