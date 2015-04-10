@@ -6,272 +6,272 @@
 -- Check out http://mdbtools.sourceforge.net
 -- ----------------------------------------------------------
 
-CREATE TABLE "CATEGORIA PRODUTO"
+PRAGMA encoding="UTF-8";
+
+CREATE TABLE `CATEGORIA PRODUTO`
  (
-	"CodigoCategoria"			INTEGER PRIMARY KEY, 
-	"NomeCategoria"			VARCHAR (100)
+	`CodigoCategoria`			INTEGER PRIMARY KEY, 
+	`NomeCategoria`			VARCHAR (100)
 );
 
 
-CREATE TABLE "CLIENTE"
+CREATE TABLE `CLIENTE`
  (
-	"CodigoCliente"			INTEGER PRIMARY KEY, 
-	"NomeCliente"			VARCHAR (100), 
-	"ReferenciaCliente"			VARCHAR (60), 
-	"RuaCliente"			VARCHAR (80), 
-	"BairroCliente"			VARCHAR (60), 
-	"CidadeCliente"			VARCHAR (60), 
-	"CepCliente"			VARCHAR (30), 
-	"FonreResidencialCliente"			VARCHAR (30), 
-	"FoneComercialCliente"			VARCHAR (30), 
-	"ComplementeCliente"			TEXT, 
-	"TipoEndCliente"			VARCHAR (2), 
-	"FoneCelular"			VARCHAR (30)
+	`CodigoCliente`			INTEGER PRIMARY KEY, 
+	`NomeCliente`			VARCHAR (100), 
+	`ReferenciaCliente`			VARCHAR (60), 
+	`RuaCliente`			VARCHAR (80), 
+	`BairroCliente`			VARCHAR (60), 
+	`CidadeCliente`			VARCHAR (60), 
+	`CepCliente`			VARCHAR (30), 
+	`FonreResidencialCliente`			VARCHAR (30), 
+	`FoneComercialCliente`			VARCHAR (30), 
+	`ComplementeCliente`			TEXT, 
+	`TipoEndCliente`			VARCHAR (2), 
+	`FoneCelular`			VARCHAR (30)
 );
 
--- CREATE INDEXES ...
-CREATE INDEX "CLIENTE_NomeCliente_idx" ON "CLIENTE" ("NomeCliente");
+CREATE INDEX `CLIENTE_NomeCliente_idx` ON "CLIENTE" (`NomeCliente`);
 
 
-CREATE TABLE "COBRANCA"
+CREATE TABLE `COBRANCA`
  (
-	"codigoserv"			INTEGER PRIMARY KEY, 
-	"histórico"			TEXT, 
-	"valor"			DOUBLE PRECISION, 
-	"data"			DATE, 
-	"codigoocorrencia"			INTEGER, 
-	"codigocliente"			INTEGER
-);
-
-
-CREATE TABLE "COR"
- (
-	"CodigoCor"			INTEGER PRIMARY KEY, 
-	"NomeCor"			VARCHAR (40)
-);
-
--- CREATE INDEXES ...
-CREATE INDEX "COR_NomeCor_idx" ON "COR" ("NomeCor");
-
-
-CREATE TABLE "DIAGNOSTICO"
- (
-	"CodigoDiagnostico"			INTEGER PRIMARY KEY, 
-	"DescricaoDiagnostico"			VARCHAR (120)
+	`codigoserv`			INTEGER PRIMARY KEY, 
+	`histórico`			TEXT, 
+	`valor`			DOUBLE PRECISION, 
+	`data`			DATE, 
+	`codigoocorrencia`			INTEGER REFERENCES OCORRENCIA(CodigoOcorrencia), 
+	`codigocliente`			INTEGER REFERENCES CLIENTE(CodigoCliente)
 );
 
 
-CREATE TABLE "DISTRIBUIDOR PRODUTO"
+CREATE TABLE `COR`
  (
-	"CodigoDistribuidor"			INTEGER PRIMARY KEY, 
-	"NomeDistribuidor"			VARCHAR (100), 
-	"EnderecoDistribuidor"			VARCHAR (100), 
-	"CidadeDistribuidor"			VARCHAR (100), 
-	"CepDistribuidor"			VARCHAR (100), 
-	"EstadoDistribuidor"			VARCHAR (100), 
-	"Fone1Distribuidor"			VARCHAR (100), 
-	"Fone2Distribuidor"			VARCHAR (100), 
-	"FaxDistribuidor"			VARCHAR (100), 
-	"ContatoDistribuidor"			VARCHAR (100)
+	`CodigoCor`			INTEGER PRIMARY KEY, 
+	`NomeCor`			VARCHAR (40)
+);
+
+CREATE INDEX `COR_NomeCor_idx` ON "COR" (`NomeCor`);
+
+
+CREATE TABLE `DIAGNOSTICO`
+ (
+	`CodigoDiagnostico`			INTEGER PRIMARY KEY, 
+	`DescricaoDiagnostico`			VARCHAR (120)
 );
 
 
-CREATE TABLE "DOENCA"
+CREATE TABLE `DISTRIBUIDOR PRODUTO`
  (
-	"CodigoDoença"			INTEGER PRIMARY KEY, 
-	"NomeDoença"			VARCHAR (60)
+	`CodigoDistribuidor`			INTEGER PRIMARY KEY, 
+	`NomeDistribuidor`			VARCHAR (100), 
+	`EnderecoDistribuidor`			VARCHAR (100), 
+	`CidadeDistribuidor`			VARCHAR (100), 
+	`CepDistribuidor`			VARCHAR (100), 
+	`EstadoDistribuidor`			VARCHAR (100), 
+	`Fone1Distribuidor`			VARCHAR (100), 
+	`Fone2Distribuidor`			VARCHAR (100), 
+	`FaxDistribuidor`			VARCHAR (100), 
+	`ContatoDistribuidor`			VARCHAR (100)
 );
 
 
-CREATE TABLE "ESPECIE"
+CREATE TABLE `DOENCA`
  (
-	"CodigoEspecie"			INTEGER PRIMARY KEY, 
-	"NomeEspecie"			VARCHAR (40), 
-	"AdjetivoMalaDireta"			VARCHAR (100)
+	`CodigoDoença`			INTEGER PRIMARY KEY, 
+	`NomeDoença`			VARCHAR (60)
 );
 
 
-CREATE TABLE "FABRICANTE PRODUTO"
+CREATE TABLE `ESPECIE`
  (
-	"CodigoFabricante"			INTEGER PRIMARY KEY, 
-	"NomeFabricante"			VARCHAR (100)
+	`CodigoEspecie`			INTEGER PRIMARY KEY, 
+	`NomeEspecie`			VARCHAR (40), 
+	`AdjetivoMalaDireta`			VARCHAR (100)
 );
 
 
-CREATE TABLE "FABRICANTE VACINA"
+CREATE TABLE `FABRICANTE PRODUTO`
  (
-	"CodigoFabricante"			INTEGER PRIMARY KEY, 
-	"NomeFabricante"			VARCHAR (100)
+	`CodigoFabricante`			INTEGER PRIMARY KEY, 
+	`NomeFabricante`			VARCHAR (100)
 );
 
 
-CREATE TABLE "lixo1"
+CREATE TABLE `FABRICANTE VACINA`
  (
-	"CodigoPaciente"			INTEGER PRIMARY KEY, 
-	"MáxDeDataAtendimento"			DATE
-);
-
-CREATE TABLE "MOVIMENTO PRODUTO"
- (
-	"NumeroMovimento"			INTEGER PRIMARY KEY, 
-	"CódigoProduto"			INTEGER, 
-	"MovimentoData"			DATE, 
-	"EntradaSaída"			VARCHAR (2), 
-	"TipoMovimento"			INTEGER, 
-	"QuantidadeMovimentada"			DOUBLE PRECISION, 
-	"HistoricoMovimentacao"			TEXT, 
-	"ValorMovimento"			DOUBLE PRECISION, 
-	"QuantidadeAnterior"			DOUBLE PRECISION, 
-	"EntradaSaídaAnterior"			VARCHAR (2)
-);
-
--- CREATE INDEXES ...
-CREATE INDEX "MOVIMENTO PRODUTO_CódigoProduto_idx" ON "MOVIMENTO PRODUTO" ("CódigoProduto");
-
-
-CREATE TABLE "OCORRENCIA"
- (
-	"CodigoOcorrencia"			INTEGER PRIMARY KEY, 
-	"DescricaoOcorrencia"			VARCHAR (40)
+	`CodigoFabricante`			INTEGER PRIMARY KEY, 
+	`NomeFabricante`			VARCHAR (100)
 );
 
 
-CREATE TABLE "PRODUTO"
+CREATE TABLE `lixo1`
  (
-	"CodigoProduto"			INTEGER PRIMARY KEY, 
-	"NomeProduto"			VARCHAR (100), 
-	"UnidadeProduto"			VARCHAR (100), 
-	"DescricaoProduto"			TEXT, 
-	"PrecoProduto"			DOUBLE PRECISION, 
-	"FabricanteProduto"			INTEGER, 
-	"CategoriaProduto"			INTEGER, 
-	"DistribuidorProduto"			INTEGER, 
-	"QuantidadeEstoque"			DOUBLE PRECISION, 
-	"EstoqueMínimo"			DOUBLE PRECISION, 
-	"EstoqueMáximo"			DOUBLE PRECISION, 
-	"PropriedadeProduto"			INTEGER
+	`CodigoPaciente`			INTEGER PRIMARY KEY, 
+	`MáxDeDataAtendimento`			DATE
+);
+
+CREATE TABLE `MOVIMENTO PRODUTO`
+ (
+	`NumeroMovimento`			INTEGER PRIMARY KEY, 
+	`CódigoProduto`			INTEGER REFERENCES PRODUTO(`CodigoProduto`), 
+	`MovimentoData`			DATE, 
+	`EntradaSaída`			VARCHAR (2), 
+	`TipoMovimento`			INTEGER REFERENCES "TIPO MOVIMENTO PRODUTO"(CodigoTipoMovimento),
+	`QuantidadeMovimentada`			DOUBLE PRECISION, 
+	`HistoricoMovimentacao`			TEXT, 
+	`ValorMovimento`			DOUBLE PRECISION, 
+	`QuantidadeAnterior`			DOUBLE PRECISION, 
+	`EntradaSaídaAnterior`			VARCHAR (2)
+);
+
+CREATE INDEX `MOVIMENTO PRODUTO_CódigoProduto_idx` ON "MOVIMENTO PRODUTO" (`CódigoProduto`);
+
+
+CREATE TABLE `OCORRENCIA`
+ (
+	`CodigoOcorrencia`			INTEGER PRIMARY KEY, 
+	`DescricaoOcorrencia`			VARCHAR (40)
 );
 
 
-CREATE TABLE "PRODUTO1"
+CREATE TABLE `PRODUTO`
  (
-	"CodigoProduto"			INTEGER PRIMARY KEY, 
-	"NomeProduto"			VARCHAR (100), 
-	"UnidadeProduto"			VARCHAR (100), 
-	"DescricaoProduto"			TEXT, 
-	"PrecoProduto"			DOUBLE PRECISION, 
-	"FabricanteProduto"			INTEGER, 
-	"CategoriaProduto"			INTEGER, 
-	"DistribuidorProduto"			INTEGER, 
-	"QuantidadeEstoque"			DOUBLE PRECISION, 
-	"EstoqueMínimo"			DOUBLE PRECISION, 
-	"EstoqueMáximo"			DOUBLE PRECISION, 
-	"PropriedadeProduto"			INTEGER
+	`CodigoProduto`			INTEGER PRIMARY KEY, 
+	`NomeProduto`			VARCHAR (100), 
+	`UnidadeProduto`			VARCHAR (100), 
+	`DescricaoProduto`			TEXT, 
+	`PrecoProduto`			DOUBLE PRECISION, 
+	`FabricanteProduto`			INTEGER REFERENCES "FABRICANTE PRODUTO"(CodigoFabricante), 
+	`CategoriaProduto`			INTEGER REFERENCES "CATEGORIA PRODUTO"(CodigoCategoria), 
+	`DistribuidorProduto`			INTEGER REFERENCES "DISTRIBUIDOR PRODUTO"(CodigoDistribuidor), 
+	`QuantidadeEstoque`			DOUBLE PRECISION, 
+	`EstoqueMínimo`			DOUBLE PRECISION, 
+	`EstoqueMáximo`			DOUBLE PRECISION, 
+	`PropriedadeProduto`			INTEGER REFERENCES "PROPRIEDADE PRODUTO"(CodigoPropriedade)
 );
 
 
-CREATE TABLE "PROPRIEDADE PRODUTO"
+CREATE TABLE `PRODUTO1`
  (
-	"CodigoPropriedade"			INTEGER PRIMARY KEY, 
-	"DescricaoPropriedade"			VARCHAR (100)
+	`CodigoProduto`			INTEGER PRIMARY KEY, 
+	`NomeProduto`			VARCHAR (100), 
+	`UnidadeProduto`			VARCHAR (100), 
+	`DescricaoProduto`			TEXT, 
+	`PrecoProduto`			DOUBLE PRECISION, 
+	`FabricanteProduto`			INTEGER REFERENCES "FABRICANTE PRODUTO"(CodigoFabricante), 
+	`CategoriaProduto`			INTEGER REFERENCES "CATEGORIA PRODUTO"(CodigoCategoria), 
+	`DistribuidorProduto`			INTEGER REFERENCES "DISTRIBUIDOR PRODUTO"(CodigoDistribuidor), 
+	`QuantidadeEstoque`			DOUBLE PRECISION, 
+	`EstoqueMínimo`			DOUBLE PRECISION, 
+	`EstoqueMáximo`			DOUBLE PRECISION, 
+	`PropriedadeProduto`			INTEGER REFERENCES "PROPRIEDADE PRODUTO"(CodigoPropriedade)
 );
 
 
-CREATE TABLE "RACA"
+CREATE TABLE `PROPRIEDADE PRODUTO`
  (
-	"CodigoEspecie"			INTEGER, 
-	"CodigoRaca"			INTEGER, 
-	"NomeRaca"			VARCHAR (100),
-    UNIQUE ("CodigoEspecie", "CodigoRaca")
+	`CodigoPropriedade`			INTEGER PRIMARY KEY, 
+	`DescricaoPropriedade`			VARCHAR (100)
 );
 
 
-CREATE TABLE "SUBDIAGNOSTICO"
+CREATE TABLE `RACA`
  (
-	"CodigoDiagnostico"			INTEGER, 
-	"CodigoSubDiagnostico"			INTEGER PRIMARY KEY, 
-	"DescricaoSubDiagnostico"			VARCHAR (120)
+	`CodigoEspecie`			INTEGER REFERENCES ESPECIE(CodigoEspecie), 
+	`CodigoRaca`			INTEGER, 
+	`NomeRaca`			VARCHAR (100),
+    UNIQUE (`CodigoEspecie`, "CodigoRaca")
 );
 
 
-CREATE TABLE "TIPO MOVIMENTO PRODUTO"
+CREATE TABLE `SUBDIAGNOSTICO`
  (
-	"CodigoTipoMovimento"			INTEGER PRIMARY KEY, 
-	"DescricaoTipoMovimento"			VARCHAR (100)
+	`CodigoDiagnostico`			INTEGER REFERENCES DIAGNOSTICO(CodigoDiagnostico), 
+	`CodigoSubDiagnostico`			INTEGER PRIMARY KEY, 
+	`DescricaoSubDiagnostico`			VARCHAR (120)
 );
 
 
-CREATE TABLE "TIPO VACINA"
+CREATE TABLE `TIPO MOVIMENTO PRODUTO`
  (
-	"CodigoTipoVacina"			INTEGER PRIMARY KEY, 
-	"DescriçãoTipoVacina"			VARCHAR (100)
+	`CodigoTipoMovimento`			INTEGER PRIMARY KEY, 
+	`DescricaoTipoMovimento`			VARCHAR (100)
 );
 
 
-CREATE TABLE "TIPO VACINA x DOENÇA"
+CREATE TABLE `TIPO VACINA`
  (
-	"CodigoTipoVacina"			INTEGER, 
-	"CodigoDoença"			INTEGER
+	`CodigoTipoVacina`			INTEGER PRIMARY KEY, 
+	`DescriçãoTipoVacina`			VARCHAR (100)
 );
 
 
-CREATE TABLE "UNIDADE"
+
+CREATE TABLE `VACINA APLICADA`
  (
-	"SiglaUnidade"			VARCHAR (100), 
-	"NomeUnidade"			VARCHAR (100)
+	`CodigoPaciente`			INTEGER REFERENCES PACIENTE(CodigoPaciente), 
+	`DataVacinacao`			DATE, 
+	`CodigoTipoVacina`			INTEGER REFERENCES "TIPO VACINA"(CodigoTipoVacina), 
+	`HistoricoVacinacao`			TEXT, 
+	`CodigoFabricante`			INTEGER REFERENCES "FABRICANTE VACINA"(CodigoFabricante), 
+	`PartidaVacina`			VARCHAR (100)
 );
 
 
-CREATE TABLE "VACINA APLICADA"
+CREATE TABLE `TIPO VACINA x DOENÇA`
  (
-	"CodigoPaciente"			INTEGER, 
-	"DataVacinacao"			DATE, 
-	"CodigoTipoVacina"			INTEGER, 
-	"HistoricoVacinacao"			TEXT, 
-	"CodigoFabricante"			INTEGER, 
-	"PartidaVacina"			VARCHAR (100)
+	`CodigoDoença`			INTEGER REFERENCES DOENCA(`CodigoDoença`),
+	`CodigoTipoVacina`			INTEGER REFERENCES "TIPO VACINA"(CodigoTipoVacina)
 );
 
 
-CREATE TABLE "VACINA PLANEJADA"
+CREATE TABLE `UNIDADE`
  (
-	"CodigoPaciente"			INTEGER, 
-	"DataVacinacao"			DATE, 
-	"CodigoTipoVacina"			INTEGER
+	`SiglaUnidade`			VARCHAR (100), 
+	`NomeUnidade`			VARCHAR (100)
 );
 
 
-CREATE TABLE "ATENDIMENTO"
+CREATE TABLE `VACINA PLANEJADA`
  (
-	"NumeroAtendimento"			INTEGER PRIMARY KEY, 
-	"CodigoPaciente"			INTEGER, 
-	"DataAtendimento"			DATE DEFAULT CURRENT_TIMESTAMP, 
-	"CodigoOcorrencia"			INTEGER, 
-	"CodigoDiagnostico"			INTEGER, 
-	"CodigoSubDiagnostico"			INTEGER, 
-	"Historico"			TEXT, 
-	"ValorAtendimento"			REAL, 
-	"QuitacaoAtendimento"			VARCHAR (2)
+	`CodigoPaciente`			INTEGER REFERENCES PACIENTE(CodigoPaciente), 
+	`DataVacinacao`			DATE, 
+	`CodigoTipoVacina`			INTEGER REFERENCES "TIPO VACINA"(CodigoTipoVacina)
 );
 
 
-CREATE TABLE "PACIENTE"
+CREATE TABLE `ATENDIMENTO`
  (
-	"CodigoPaciente"			INTEGER PRIMARY KEY, 
-	"CodigoPlanoVacinacao"			INTEGER, 
-	"SexoPaciente"			VARCHAR (2), 
-	"CorPaciente"			INTEGER REFERENCES COR(CodigoCor), 
-	"NascimentoPaciente"			DATE, 
-	"FalecimentoPaciente"			DATE, 
-	"CausaFalecimentoPaciente"			DOUBLE PRECISION, 
-	"ClientePaciente"			INTEGER, 
-	"CadastramentoPaciente"			DATE, 
-	"ObservaçaoPaciente"			TEXT, 
-	"PedigreePaciente"			VARCHAR (2), 
-	"StatusPaciente"			VARCHAR (2), 
-	"NomePaciente"			VARCHAR (40), 
-	"CruzamentoPaciente"			VARCHAR (2), 
-	"EspeciePaciente"			INTEGER, 
-	"RacaPaciente"			INTEGER, 
-	"SelecaoVacinacao"			VARCHAR (2)
+	`NumeroAtendimento`			INTEGER PRIMARY KEY, 
+	`CodigoPaciente`			INTEGER REFERENCES PACIENTE(CodigoPaciente), 
+	`DataAtendimento`			DATE DEFAULT CURRENT_TIMESTAMP, 
+	`CodigoOcorrencia`			INTEGER REFERENCES OCORRENCIA(CodigoOcorrencia), 
+	`Historico`			TEXT, 
+	`ValorAtendimento`			REAL, 
+	`QuitacaoAtendimento`			VARCHAR (2),
+	`CodigoDiagnostico`			INTEGER REFERENCES DIAGNOSTICO(CodigoDiagnostico),
+	`CodigoSubDiagnostico`			INTEGER REFERENCES SUBDIAGNOSTICO(CodigoSubDiagnostico)
+);
+
+
+CREATE TABLE `PACIENTE`
+ (
+	`CodigoPaciente`			INTEGER PRIMARY KEY, 
+	`CodigoPlanoVacinacao`			INTEGER, 
+	`SexoPaciente`			VARCHAR (2), 
+	`CorPaciente`			INTEGER REFERENCES COR(CodigoCor), 
+	`NascimentoPaciente`			DATE, 
+	`FalecimentoPaciente`			DATE, 
+	`CausaFalecimentoPaciente`			DOUBLE PRECISION, 
+	`ClientePaciente`			INTEGER, 
+	`CadastramentoPaciente`			DATE, 
+	`ObservaçaoPaciente`			TEXT, 
+	`PedigreePaciente`			VARCHAR (2), 
+	`StatusPaciente`			VARCHAR (2), 
+	`NomePaciente`			VARCHAR (40), 
+	`CruzamentoPaciente`			VARCHAR (2), 
+	`EspeciePaciente`			INTEGER REFERENCES ESPECIE(CodigoEspecie), 
+	`RacaPaciente`			INTEGER REFERENCES RACA(CodigoRaca), 
+	`SelecaoVacinacao`			VARCHAR (2)
 );

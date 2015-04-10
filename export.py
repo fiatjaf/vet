@@ -13,8 +13,11 @@ with open('Paciente.schema.sql') as f:
     schema = f.read()
 
 for statement in schema.split('\n\n'):
-    c.execute(statement)
-
+    try:
+        c.execute(statement)
+    except Exception, e:
+        print statement
+        raise(e)
 
 table_names = subprocess.Popen(["mdb-tables", "-1", db], stdout=subprocess.PIPE).communicate()[0]
 tables = table_names.splitlines()
