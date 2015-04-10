@@ -16,6 +16,7 @@
         {% set foreign_key_table = foreign_key.table %}
         {% set foreign_key_column = foreign_key.column %}
         <select name="{{ column_name }}">
+          <option></option>
           {% for id, name in list_foreign_key(table=foreign_key_table, column=foreign_key_column) %}
             <option value="{{ id }}" {% if id == item %}selected{% endif %}>{{ name }}</option>
           {% endfor %}
@@ -35,7 +36,7 @@
       {% endif %}
     </div>
   {% endfor %}
-  <button type="submit">Salvar</button>
+  <button type="submit">SALVAR</button>
 </form>
 
 {% endblock %}

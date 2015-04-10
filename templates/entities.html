@@ -20,7 +20,7 @@
       </td>
       {% for item in row %}
         <td>
-          {% if columns.keys()[loop.index0] in foreign_keys %}
+          {% if item and columns.keys()[loop.index0] in foreign_keys %}
             {% set foreign_key = foreign_keys[columns.keys()[loop.index0]] %}
             {% set foreign_key_table = foreign_key.table %}
             {% set foreign_key_column = foreign_key.column %}
