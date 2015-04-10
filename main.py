@@ -26,7 +26,7 @@ print open(db)
 connstring = 'sqlite:///' + db
 print connstring
 
-engine = create_engine(connstring, convert_unicode=True)
+engine = create_engine(connstring, convert_unicode=True, echo=app.debug)
 print engine
 print engine.__dict__
 
@@ -34,58 +34,115 @@ metadata = MetaData(bind=engine)
 conn = engine.connect()
 
 tables = {
-  'categoria-produto': {'table': Table('CATEGORIA PRODUTO', metadata, autoload=True),
-                        'name_column': 'NomeCategoria'},
-  'clientes': {'table': Table('CLIENTE', metadata, autoload=True),
-               'name_column': 'NomeCliente'},
-  'cobrancas': {'table': Table('COBRANCA', metadata, autoload=True),
-                'name_column': 'data'},
-  'cores': {'table': Table('COR', metadata, autoload=True),
-            'name_column': 'NomeCor'},
-  'diagnosticos': {'table': Table('DIAGNOSTICO', metadata, autoload=True),
-                   'name_column': 'DescricaoDiagnostico'},
-  'distribuidor-produto': {'table': Table('DISTRIBUIDOR PRODUTO', metadata, autoload=True),
-                           'name_column': 'NomeDistribuidor'},
-  'doencas': {'table': Table('DOENCA', metadata, autoload=True),
-              'name_column': 'NomeDoenca'},
-  'especies': {'table': Table('ESPECIE', metadata, autoload=True),
-               'name_column': 'NomeEspecie'},
-  'fabricante-produto': {'table': Table('FABRICANTE PRODUTO', metadata, autoload=True),
-                         'name_column': 'NomeFabricante'},
-  'fabricante-vacina': {'table': Table('FABRICANTE VACINA', metadata, autoload=True),
-                        'name_column': 'NomeFabricante'},
-  'lixo1': {'table': Table('lixo1', metadata, autoload=True),
-            'name_column': 'MáxDeDataAtendimento'},
-  'movimento-produto': {'table': Table('MOVIMENTO PRODUTO', metadata, autoload=True),
-                        'name_column': 'ValorMovimento'},
-  'ocorrencias': {'table': Table('OCORRENCIA', metadata, autoload=True),
-                  'name_column': 'DescricaoOcorrencia'},
-  'produtos': {'table': Table('PRODUTO', metadata, autoload=True),
-               'name_column': 'NomeProduto'},
-  'produto1': {'table': Table('PRODUTO1', metadata, autoload=True),
-               'name_column': 'NomeProduto'},
-  'propriedade-produto': {'table': Table('PROPRIEDADE PRODUTO', metadata, autoload=True),
-                          'name_column': 'DescricaoPropriedade'},
-  'racas': {'table': Table('RACA', metadata, autoload=True),
-            'name_column': 'NomeRaca'},
-  'subdiagnosticos': {'table': Table('SUBDIAGNOSTICO', metadata, autoload=True),
-                      'name_column': 'DescricaoSubDiagnostico'},
-  'tipo-movimento-produto': {'table': Table('TIPO MOVIMENTO PRODUTO', metadata, autoload=True),
-                             'name_column': 'DescricaoTipoMovimento'},
-  'tipo-vacina': {'table': Table('TIPO VACINA', metadata, autoload=True),
-                  'name_column': 'DescricãoTipoVacina'},
-  'vacinas-aplicadas': {'table': Table('VACINA APLICADA', metadata, autoload=True),
-                        'name_column': 'DataVacinacao'},
-  'tipo-vacina-x-doenca': {'table': Table('TIPO VACINA x DOENCA', metadata, autoload=True),
-                           'name_column': None},
-  'unidades': {'table': Table('UNIDADE', metadata, autoload=True),
-               'name_column': 'NomeUnidade'},
-  'vacinas-planejadas': {'table': Table('VACINA PLANEJADA', metadata, autoload=True),
-                         'name_column': 'DataVacinacao'},
-  'atendimentos': {'table': Table('ATENDIMENTO', metadata, autoload=True),
-                   'name_column': 'Historico'},
-  'pacientes': {'table': Table('PACIENTE', metadata, autoload=True),
-                'name_column': 'NomePaciente'},
+  'categoria-produto': {
+    'table': Table('CATEGORIA PRODUTO', metadata, autoload=True),
+    'name_column': 'NomeCategoria',
+  },
+  'clientes': {
+    'table': Table('CLIENTE', metadata, autoload=True),
+    'name_column': 'NomeCliente',
+    'sort_column': 'NomeCliente',
+  },
+  'cobrancas': {
+    'table': Table('COBRANCA', metadata, autoload=True),
+    'name_column': 'data',
+  },
+  'cores': {
+    'table': Table('COR', metadata, autoload=True),
+    'name_column': 'NomeCor',
+  },
+  'diagnosticos': {
+    'table': Table('DIAGNOSTICO', metadata, autoload=True),
+    'name_column': 'DescricaoDiagnostico',
+  },
+  'distribuidor-produto': {
+    'table': Table('DISTRIBUIDOR PRODUTO', metadata, autoload=True),
+    'name_column': 'NomeDistribuidor',
+  },
+  'doencas': {
+    'table': Table('DOENCA', metadata, autoload=True),
+    'name_column': 'NomeDoenca',
+  },
+  'especies': {
+    'table': Table('ESPECIE', metadata, autoload=True),
+    'name_column': 'NomeEspecie',
+  },
+  'fabricante-produto': {
+    'table': Table('FABRICANTE PRODUTO', metadata, autoload=True),
+    'name_column': 'NomeFabricante',
+  },
+  'fabricante-vacina': {
+    'table': Table('FABRICANTE VACINA', metadata, autoload=True),
+    'name_column': 'NomeFabricante',
+  },
+  'lixo1': {
+    'table': Table('lixo1', metadata, autoload=True),
+    'name_column': 'MáxDeDataAtendimento',
+  },
+  'movimento-produto': {
+    'table': Table('MOVIMENTO PRODUTO', metadata, autoload=True),
+    'name_column': 'ValorMovimento',
+  },
+  'ocorrencias': {
+    'table': Table('OCORRENCIA', metadata, autoload=True),
+    'name_column': 'DescricaoOcorrencia',
+  },
+  'produtos': {
+    'table': Table('PRODUTO', metadata, autoload=True),
+    'name_column': 'NomeProduto',
+  },
+  'produto1': {
+    'table': Table('PRODUTO1', metadata, autoload=True),
+    'name_column': 'NomeProduto',
+  },
+  'propriedade-produto': {
+    'table': Table('PROPRIEDADE PRODUTO', metadata, autoload=True),
+    'name_column': 'DescricaoPropriedade',
+  },
+  'racas': {
+    'table': Table('RACA', metadata, autoload=True),
+    'name_column': 'NomeRaca',
+  },
+  'subdiagnosticos': {
+    'table': Table('SUBDIAGNOSTICO', metadata, autoload=True),
+    'name_column': 'DescricaoSubDiagnostico',
+  },
+  'tipo-movimento-produto': {
+    'table': Table('TIPO MOVIMENTO PRODUTO', metadata, autoload=True),
+    'name_column': 'DescricaoTipoMovimento',
+  },
+  'tipo-vacina': {
+    'table': Table('TIPO VACINA', metadata, autoload=True),
+    'name_column': 'DescricãoTipoVacina',
+  },
+  'vacinas-aplicadas': {
+    'table': Table('VACINA APLICADA', metadata, autoload=True),
+    'name_column': 'DataVacinacao',
+    'sort_column': 'DataVacinacao DESC',
+  },
+  'tipo-vacina-x-doenca': {
+    'table': Table('TIPO VACINA x DOENCA', metadata, autoload=True),
+    'name_column': None,
+  },
+  'unidades': {
+    'table': Table('UNIDADE', metadata, autoload=True),
+    'name_column': 'NomeUnidade',
+  },
+  'vacinas-planejadas': {
+    'table': Table('VACINA PLANEJADA', metadata, autoload=True),
+    'name_column': 'DataVacinacao',
+    'sort_column': 'DataVacinacao DESC',
+  },
+  'atendimentos': {
+    'table': Table('ATENDIMENTO', metadata, autoload=True),
+    'name_column': 'Historico',
+    'sort_column': 'DataAtendimento DESC',
+  },
+  'pacientes': {
+    'table': Table('PACIENTE', metadata, autoload=True),
+    'name_column': 'NomePaciente',
+    'sort_column': 'NomePaciente',
+  },
 }
 tablenames = {v['table']: k for k, v in tables.items()}
 
@@ -93,7 +150,9 @@ tablenames = {v['table']: k for k, v in tables.items()}
 @memoize
 def fk2name(id, table, column):
     tablecolumn = getattr(table.c, column)
-    record = table.select(tablecolumn == id).execute().first()
+    record = table.select(tablecolumn == id) \
+                  .execute() \
+                  .first()
     return row2name(record, table) or id
 
 @app.template_filter('record2name')
@@ -102,7 +161,11 @@ def row2name(record, table):
     return getattr(record, namecolumn, None)
 
 def list_foreign_key(table, column):
-    for record in table.select().execute():
+    query = table.select()
+    if 'sort_column' in tables[tablenames[table]]:
+        query = query.order_by(tables[tablenames[table]]['sort_column'])
+
+    for record in query.execute():
         primary_key = table.primary_key.columns.keys()[0]
         id = getattr(record, primary_key)
         name = row2name(record, table)
@@ -147,7 +210,12 @@ def get(table_name, id=None):
                                primary_key=pk,
                                foreign_keys=fk)
     else:
-        r = table.select().offset(offset).limit(limit).execute().fetchall()
+        query = table.select()
+        if 'sort_column' in tables[table_name]:
+            print '\n\n', tables[table_name]['sort_column'], '\n\n\n'
+            query = query.order_by(tables[table_name]['sort_column'])
+
+        r = query.offset(offset).limit(limit).execute().fetchall()
         return render_template('entities.html',
                                limit=limit,
                                offset=offset,
