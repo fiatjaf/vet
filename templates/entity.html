@@ -2,13 +2,37 @@
 
 {% block body %}
 
-<h1><a href="/">Início</a> / <a href="/{{ table_name }}/">{{ table_name | replace('-', ' ') | title }}</a> / {{ data[columns.index(primary_key)] }}</h1>
+<h1><a href="/">Início</a> / <a href="/{{ table_name }}/">{{ table_name | replace('-', ' ') | title }}</a> / {{ data | record2name(table=table) }}</h1>
 
-<form method="post" action="/{{ table_name }}/{{ data[columns.index(primary_key)] }}/">
+<form method="post" action="/{{ table_name }}/{{ data[columns.keys().index(primary_key)] }}/">
   {% for item in data %}
     <div>
-      <label>{{ columns[loop.index0] }}:</label>
-      <input name="{{ columns[loop.index0] }}" placeholder="{{ columns[loop.index0] }}" value="{{ item }}">
+      {% set column_name = columns.keys()[loop.index0] %}
+      {% set column = columns[column_name] %}
+      <label>{{ column_name }}:</label>
+
+      {% if column_name in foreign_keys %}
+        {% set foreign_key = foreign_keys[column_name] %}
+        {% set foreign_key_table = foreign_key.table %}
+        {% set foreign_key_column = foreign_key.column %}
+        <select name="{{ column_name }}">
+          {% for id, name in list_foreign_key(table=foreign_key_table, column=foreign_key_column) %}
+            <option value="{{ id }}" {% if id == item %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      {% elif column.type.__visit_name__  == 'TEXT' %}
+        {% if not column.type.length or column.type.length > 100 %}
+          <textarea name="{{ column_name }}">{{ item }}</textarea>
+        {% else %}
+          <input name="{{ column_name }}"
+                 maxlength="{{ column.type.length }}"
+                 style="width: {{ (column.type.length * 8 ) + 8 }}px"
+                 value="{{ item }}">
+        {% endif %}
+      {% else %}
+        <input name="{{ column_name }}"
+               value="{{ item }}">
+      {% endif %}
     </div>
   {% endfor %}
   <button type="submit">Salvar</button>

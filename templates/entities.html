@@ -7,7 +7,7 @@
 <table>
   <tr>
     <th></th>
-    {% for name in columns %}
+    {% for name, column in columns.items() %}
       <th>{{ name }}</th>
     {% endfor %}
   </tr>
@@ -15,13 +15,13 @@
     <tr>
       <td>
         {% if primary_key %}
-        <a href="/{{ table_name }}/{{ row[columns.index(primary_key)] }}">VER</a>
+        <a href="/{{ table_name }}/{{ row[columns.keys().index(primary_key)] }}">VER</a>
         {% endif %}
       </td>
       {% for item in row %}
         <td>
-          {% if columns[loop.index0] in foreign_keys %}
-            {% set foreign_key = foreign_keys[columns[loop.index0]] %}
+          {% if columns.keys()[loop.index0] in foreign_keys %}
+            {% set foreign_key = foreign_keys[columns.keys()[loop.index0]] %}
             {% set foreign_key_table = foreign_key.table %}
             {% set foreign_key_column = foreign_key.column %}
             <a href="/{{ tablenames[foreign_key_table] }}/{{ item }}">

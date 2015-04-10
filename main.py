@@ -31,6 +31,7 @@ print engine
 print engine.__dict__
 
 metadata = MetaData(bind=engine)
+conn = engine.connect()
 
 tables = {
   'categoria-produto': {'table': Table('CATEGORIA PRODUTO', metadata, autoload=True),
@@ -88,23 +89,33 @@ tables = {
 }
 tablenames = {v['table']: k for k, v in tables.items()}
 
+@app.template_filter('fk2name')
+@memoize
+def fk2name(id, table, column):
+    tablecolumn = getattr(table.c, column)
+    record = table.select(tablecolumn == id).execute().first()
+    return row2name(record, table) or id
+
+@app.template_filter('record2name')
+def row2name(record, table):
+    namecolumn = tables[tablenames[table]]['name_column']
+    return getattr(record, namecolumn, None)
+
+def list_foreign_key(table, column):
+    for record in table.select().execute():
+        primary_key = table.primary_key.columns.keys()[0]
+        id = getattr(record, primary_key)
+        name = row2name(record, table)
+        yield id, name
+
 # jinja2 globals
 @app.context_processor
 def jinja2globals():
     return {
         'tables': tables,
         'tablenames': tablenames,
+        'list_foreign_key': list_foreign_key,
     }
-
-@app.template_filter('fk2name')
-@memoize
-def fk2name(id, table, column):
-    tablecolumn = getattr(table.c, column)
-    record = table.select(tablecolumn == id).execute().first()
-    namecolumn = tables[tablenames[table]]['name_column']
-    return getattr(record, namecolumn, id) # fallback on id
-
-conn = engine.connect()
 
 @app.route('/favicon.ico')
 def nothing():
@@ -129,8 +140,9 @@ def get(table_name, id=None):
     if id:
         o = table.select(getattr(table.c, pk) == id).execute().first()
         return render_template('entity.html',
-                               columns=table.columns.keys(),
+                               columns=table.columns,
                                data=o,
+                               table=table,
                                table_name=table_name,
                                primary_key=pk,
                                foreign_keys=fk)
@@ -139,8 +151,9 @@ def get(table_name, id=None):
         return render_template('entities.html',
                                limit=limit,
                                offset=offset,
-                               columns=table.columns.keys(),
+                               columns=table.columns,
                                rows=r,
+                               table=table,
                                table_name=table_name,
                                primary_key=pk,
                                foreign_keys=fk)
