@@ -37,6 +37,10 @@
   </tr>
 </table>
 
-<a href="?from={{ offset + limit }}">próxima</a>
+<form method="get" action="{{ request.url | add_query_params({'from': offset + limit}) }}">
+  <input value="{{ limit }}" name="show" size=2>
+  <button type="submit">por página</button>
+</form>
+<a href="{{ request.url | add_query_params({'from': offset + limit}) }}">próxima</a>
 
 {% endblock %}

@@ -5,6 +5,8 @@ import json
 import os
 import sys
 import sqlite3
+import urllib
+import urlparse
 
 from flask import Flask, request, render_template
 from sqlalchemy import Table, Column, Integer, String
@@ -160,6 +162,14 @@ def row2name(record, table):
     namecolumn = tables[tablenames[table]]['name_column']
     return getattr(record, namecolumn, None)
 
+@app.template_filter('add_query_params')
+def add_query_params(url, params):
+    url_parts = list(urlparse.urlparse(url))
+    query = dict(urlparse.parse_qsl(url_parts[4]))
+    query.update(params)
+    url_parts[4] = urllib.urlencode(query)
+    return urlparse.urlunparse(url_parts)
+
 def list_foreign_key(table, column):
     query = table.select()
     if 'sort_column' in tables[tablenames[table]]:
@@ -212,7 +222,6 @@ def get(table_name, id=None):
     else:
         query = table.select()
         if 'sort_column' in tables[table_name]:
-            print '\n\n', tables[table_name]['sort_column'], '\n\n\n'
             query = query.order_by(tables[table_name]['sort_column'])
 
         r = query.offset(offset).limit(limit).execute().fetchall()
