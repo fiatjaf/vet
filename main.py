@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 #!/usr/bin/env python
 
+import datetime
 import json
 import os
 import sys
@@ -8,7 +9,7 @@ import sqlite3
 import urllib
 import urlparse
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 from sqlalchemy import Table, Column, Integer, String
 from sqlalchemy import create_engine, MetaData
 from utils import memoize
@@ -28,7 +29,7 @@ print open(db)
 connstring = 'sqlite:///' + db
 print connstring
 
-engine = create_engine(connstring, convert_unicode=True, echo=app.debug)
+engine = create_engine(connstring, echo=app.debug)
 print engine
 print engine.__dict__
 
@@ -168,7 +169,7 @@ for name, data in tables.items():
 @memoize
 def fk2name(id, table, column):
     tablecolumn = getattr(table.c, column)
-    record = table.select(tablecolumn == id) \
+    record = table.select(tablecolumn == int(id)) \
                   .execute() \
                   .first()
     return row2name(record, table) or id
@@ -212,16 +213,35 @@ def jinja2globals():
 def nothing():
     return ''
 
-@app.route('/<table_name>/<id>/', methods=['GET'])
 @app.route('/<table_name>/', methods=['GET'])
-def get(table_name, id=None):
+def entities(table_name):
     tabledata = tables[table_name]
     table = tabledata['table']
     offset = int(request.args.get('from', 0))
     limit = int(request.args.get('show', 20))
 
-    if id:
-        o = table.select(getattr(table.c, tabledata['primary_key']) == id).execute().first()
+    query = table.select()
+    if 'sort_column' in tabledata:
+        query = query.order_by(tabledata['sort_column'])
+
+    r = query.offset(offset).limit(limit).execute().fetchall()
+    return render_template('entities.html',
+                           limit=limit,
+                           offset=offset,
+                           columns=table.columns,
+                           rows=r,
+                           table=table,
+                           table_name=table_name,
+                           primary_key=tabledata['primary_key'],
+                           foreign_keys=tabledata['foreign_keys'])
+
+@app.route('/<table_name>/<id>/', methods=['POST', 'GET'])
+def post(table_name, id):
+    tabledata = tables[table_name]
+    table = tabledata['table']
+
+    if request.method == 'GET':
+        o = table.select(getattr(table.c, tabledata['primary_key']) == int(id)).execute().first()
         return render_template('entity.html',
                                columns=table.columns,
                                data=o,
@@ -229,21 +249,27 @@ def get(table_name, id=None):
                                table_name=table_name,
                                primary_key=tabledata['primary_key'],
                                foreign_keys=tabledata['foreign_keys'])
-    else:
-        query = table.select()
-        if 'sort_column' in tabledata:
-            query = query.order_by(tabledata['sort_column'])
 
-        r = query.offset(offset).limit(limit).execute().fetchall()
-        return render_template('entities.html',
-                               limit=limit,
-                               offset=offset,
-                               columns=table.columns,
-                               rows=r,
-                               table=table,
-                               table_name=table_name,
-                               primary_key=tabledata['primary_key'],
-                               foreign_keys=tabledata['foreign_keys'])
+    elif request.method == 'POST':
+        update_data = {}
+        for k, value in request.form.items():
+            type = getattr(table.c, k).type.python_type
+            if type is datetime.date:
+                type = lambda s: datetime.datetime.strptime(s, '%Y-%m-%d').date()
+            elif type is str:
+                type = unicode
+
+            update_data[k] = type(value)
+
+        from pprint import pprint as pp
+        pp(update_data)
+
+        table.update() \
+             .where(getattr(table.c, tabledata['primary_key']) == int(id)) \
+             .values(update_data) \
+             .execute()
+
+        return redirect(request.url)
 
 @app.route('/')
 def index():
