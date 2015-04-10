@@ -264,7 +264,7 @@ CREATE TABLE `PACIENTE`
 	`NascimentoPaciente`			DATE, 
 	`FalecimentoPaciente`			DATE, 
 	`CausaFalecimentoPaciente`			DOUBLE PRECISION, 
-	`ClientePaciente`			INTEGER, 
+	`ClientePaciente`			INTEGER REFERENCES CLIENTE(CodigoCliente), 
 	`CadastramentoPaciente`			DATE, 
 	`ObservacaoPaciente`			TEXT, 
 	`PedigreePaciente`			VARCHAR (2), 

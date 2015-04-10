@@ -29,7 +29,7 @@ print open(db)
 connstring = 'sqlite:///' + db
 print connstring
 
-engine = create_engine(connstring, echo=app.debug)
+engine = create_engine(connstring, echo=False)
 print engine
 print engine.__dict__
 
@@ -148,6 +148,7 @@ tables = {
   },
 }
 tablenames = {}
+keys_pointing_at = {}
 for name, data in tables.items():
     tablenames[data['table']] = name
 
@@ -156,14 +157,16 @@ for name, data in tables.items():
     except IndexError:
         data['primary_key'] = None
 
-    data['foreign_keys'] = {
-        k.parent.name:  {
+    data['foreign_keys'] = {}
+    for k in data['table'].foreign_keys:
+        data['foreign_keys'][k.parent.name] = {
             'table': k.column.table,
             'column': k.column.name
-        } for k in data['table'].foreign_keys
-    }
+        }
 
-    
+        kpat = keys_pointing_at.get(k.column.table, {})
+        kpat[k.parent.table] = k.parent
+        keys_pointing_at[k.column.table] = kpat
 
 @app.template_filter('fk2name')
 @memoize
@@ -172,12 +175,28 @@ def fk2name(id, table, column):
     record = table.select(tablecolumn == int(id)) \
                   .execute() \
                   .first()
-    return row2name(record, table) or id
+    return record2name(record, table) or id
+
+@app.template_filter('record2id')
+def record2id(record, table):
+    primary_key = tables[tablenames[table]]['primary_key']
+    return getattr(record, primary_key, None)
 
 @app.template_filter('record2name')
-def row2name(record, table):
+def record2name(record, table):
     namecolumn = tables[tablenames[table]]['name_column']
     return getattr(record, namecolumn, None)
+
+@app.template_filter('select')
+@memoize
+def select(table, where=None):
+    tabledata = tables[tablenames[table]]
+
+    query = table.select(where)
+    if 'sort_column' in tabledata:
+        query = query.order_by(tabledata['sort_column'])
+
+    return tuple(query.execute())
 
 @app.template_filter('add_query_params')
 def add_query_params(url, params):
@@ -187,26 +206,13 @@ def add_query_params(url, params):
     url_parts[4] = urllib.urlencode(query)
     return urlparse.urlunparse(url_parts)
 
-def list_foreign_key(table, column):
-    tabledata = tables[tablenames[table]]
-
-    query = table.select()
-    if 'sort_column' in tabledata:
-        query = query.order_by(tabledata['sort_column'])
-
-    for record in query.execute():
-        primary_key = tabledata['primary_key']
-        id = getattr(record, primary_key) if primary_key else None
-        name = row2name(record, table)
-        yield id, name
-
 # jinja2 globals
 @app.context_processor
 def jinja2globals():
     return {
         'tables': tables,
         'tablenames': tablenames,
-        'list_foreign_key': list_foreign_key,
+        'keys_pointing_at': keys_pointing_at,
     }
 
 @app.route('/favicon.ico')

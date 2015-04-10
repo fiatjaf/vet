@@ -11,14 +11,16 @@
       {% set column = columns[column_name] %}
       <label>{{ column_name }}:</label>
 
-      {% if column_name in foreign_keys %}
-        {% set foreign_key = foreign_keys[column_name] %}
-        {% set foreign_key_table = foreign_key.table %}
-        {% set foreign_key_column = foreign_key.column %}
+      {% set foreign_key = foreign_keys.get(column_name) %}
+      {% if foreign_key and tables[tablenames[foreign_key.table]]['primary_key'] %}
         <select name="{{ column_name }}">
-          <option></option>
-          {% for id, name in list_foreign_key(table=foreign_key_table, column=foreign_key_column) %}
-            <option value="{{ id }}" {% if id == item %}selected{% endif %}>{{ name }}</option>
+          <option value="0"></option>
+          {% for record in foreign_key.table | select %}
+            {% set id = record | record2id(foreign_key.table) %}
+            <option value="{{ id }}"
+                    {% if item == id %}selected{% endif %}>
+              {{ record | record2name(foreign_key.table) }}
+            </option>
           {% endfor %}
         </select>
       {% elif column.type.__visit_name__  == 'TEXT' %}
@@ -38,5 +40,20 @@
   {% endfor %}
   <button type="submit">SALVAR</button>
 </form>
+
+<div>
+  <ul>
+  {% for table, column in keys_pointing_at.get(table, {}).items() | sort %}
+    <li>
+      <h2>{{ tablenames[table] }}</h2>
+      <ul>
+        {% for record in table | select(where=column == data[primary_key]) %}
+          <li><a href="/{{ tablenames[table] }}/{{ record[tables[tablenames[table]]['primary_key']] }}/">{{ record | record2name(table) }}</a></li>
+        {% endfor %}
+      </ul>
+    </li>
+  {% endfor %}
+  </ul>
+</div>
 
 {% endblock %}
