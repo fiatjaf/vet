@@ -4,7 +4,7 @@
 
 <h1>{{ name }}</h1>
 <ul>
-{% for elem in list %}
+{% for elem in list | sort %}
   <li><a href="/{{ elem }}/">{{ elem }}</a></li>
 {% endfor %}
 </ul>

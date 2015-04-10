@@ -32,41 +32,67 @@ print engine.__dict__
 metadata = MetaData(bind=engine)
 
 tables = {
-  'categoria-produto': Table('CATEGORIA PRODUTO', metadata, autoload=True),
-  'cliente': Table('CLIENTE', metadata, autoload=True),
-  'cobranca': Table('COBRANCA', metadata, autoload=True),
-  'cor': Table('COR', metadata, autoload=True),
-  'diagnostico': Table('DIAGNOSTICO', metadata, autoload=True),
-  'distribuidor-produto': Table('DISTRIBUIDOR PRODUTO', metadata, autoload=True),
-  'doenca': Table('DOENCA', metadata, autoload=True),
-  'especie': Table('ESPECIE', metadata, autoload=True),
-  'fabricante-produto': Table('FABRICANTE PRODUTO', metadata, autoload=True),
-  'fabricante-vacina': Table('FABRICANTE VACINA', metadata, autoload=True),
-  'lixo1': Table('lixo1', metadata, autoload=True),
-  'movimento-produto': Table('MOVIMENTO PRODUTO', metadata, autoload=True),
-  'ocorrencia': Table('OCORRENCIA', metadata, autoload=True),
-  'produto': Table('PRODUTO', metadata, autoload=True),
-  'produto1': Table('PRODUTO1', metadata, autoload=True),
-  'propriedade-produto': Table('PROPRIEDADE PRODUTO', metadata, autoload=True),
-  'raca': Table('RACA', metadata, autoload=True),
-  'subdiagnostico': Table('SUBDIAGNOSTICO', metadata, autoload=True),
-  'tipo-movimento-produto': Table('TIPO MOVIMENTO PRODUTO', metadata, autoload=True),
-  'tipo-vacina': Table('TIPO VACINA', metadata, autoload=True),
-  'vacina-aplicada': Table('VACINA APLICADA', metadata, autoload=True),
-  'tipo-vacina-x-doenca': Table('TIPO VACINA x DOENCA', metadata, autoload=True),
-  'unidade': Table('UNIDADE', metadata, autoload=True),
-  'vacina-planejada': Table('VACINA PLANEJADA', metadata, autoload=True),
-  'atendimento': Table('ATENDIMENTO', metadata, autoload=True),
-  'paciente': Table('PACIENTE', metadata, autoload=True),
+  'categoria-produto': {'table': Table('CATEGORIA PRODUTO', metadata, autoload=True),
+                        'name_column': 'NomeCategoria'},
+  'clientes': {'table': Table('CLIENTE', metadata, autoload=True),
+               'name_column': 'NomeCliente'},
+  'cobrancas': {'table': Table('COBRANCA', metadata, autoload=True),
+                'name_column': 'data'},
+  'cores': {'table': Table('COR', metadata, autoload=True),
+            'name_column': 'NomeCor'},
+  'diagnosticos': {'table': Table('DIAGNOSTICO', metadata, autoload=True),
+                   'name_column': 'DescricaoDiagnostico'},
+  'distribuidor-produto': {'table': Table('DISTRIBUIDOR PRODUTO', metadata, autoload=True),
+                           'name_column': 'NomeDistribuidor'},
+  'doencas': {'table': Table('DOENCA', metadata, autoload=True),
+              'name_column': 'NomeDoenca'},
+  'especies': {'table': Table('ESPECIE', metadata, autoload=True),
+               'name_column': 'NomeEspecie'},
+  'fabricante-produto': {'table': Table('FABRICANTE PRODUTO', metadata, autoload=True),
+                         'name_column': 'NomeFabricante'},
+  'fabricante-vacina': {'table': Table('FABRICANTE VACINA', metadata, autoload=True),
+                        'name_column': 'NomeFabricante'},
+  'lixo1': {'table': Table('lixo1', metadata, autoload=True),
+            'name_column': 'MáxDeDataAtendimento'},
+  'movimento-produto': {'table': Table('MOVIMENTO PRODUTO', metadata, autoload=True),
+                        'name_column': 'ValorMovimento'},
+  'ocorrencias': {'table': Table('OCORRENCIA', metadata, autoload=True),
+                  'name_column': 'DescricaoOcorrencia'},
+  'produtos': {'table': Table('PRODUTO', metadata, autoload=True),
+               'name_column': 'NomeProduto'},
+  'produto1': {'table': Table('PRODUTO1', metadata, autoload=True),
+               'name_column': 'NomeProduto'},
+  'propriedade-produto': {'table': Table('PROPRIEDADE PRODUTO', metadata, autoload=True),
+                          'name_column': 'DescricaoPropriedade'},
+  'racas': {'table': Table('RACA', metadata, autoload=True),
+            'name_column': 'NomeRaca'},
+  'subdiagnosticos': {'table': Table('SUBDIAGNOSTICO', metadata, autoload=True),
+                      'name_column': 'DescricaoSubDiagnostico'},
+  'tipo-movimento-produto': {'table': Table('TIPO MOVIMENTO PRODUTO', metadata, autoload=True),
+                             'name_column': 'DescricaoTipoMovimento'},
+  'tipo-vacina': {'table': Table('TIPO VACINA', metadata, autoload=True),
+                  'name_column': 'DescricãoTipoVacina'},
+  'vacinas-aplicadas': {'table': Table('VACINA APLICADA', metadata, autoload=True),
+                        'name_column': 'DataVacinacao'},
+  'tipo-vacina-x-doenca': {'table': Table('TIPO VACINA x DOENCA', metadata, autoload=True),
+                           'name_column': None},
+  'unidades': {'table': Table('UNIDADE', metadata, autoload=True),
+               'name_column': 'NomeUnidade'},
+  'vacinas-planejadas': {'table': Table('VACINA PLANEJADA', metadata, autoload=True),
+                         'name_column': 'DataVacinacao'},
+  'atendimentos': {'table': Table('ATENDIMENTO', metadata, autoload=True),
+                   'name_column': 'Historico'},
+  'pacientes': {'table': Table('PACIENTE', metadata, autoload=True),
+                'name_column': 'NomePaciente'},
 }
-inverted_tables = {v: k for k, v in tables.items()}
+tablenames = {v['table']: k for k, v in tables.items()}
 
 # jinja2 globals
 @app.context_processor
 def jinja2globals():
     return {
         'tables': tables,
-        'inverted_tables': inverted_tables,
+        'tablenames': tablenames,
     }
 
 conn = engine.connect()
@@ -78,7 +104,7 @@ def nothing():
 @app.route('/<table_name>/<id>/', methods=['GET'])
 @app.route('/<table_name>/', methods=['GET'])
 def get(table_name, id=None):
-    table = tables[table_name]
+    table = tables[table_name]['table']
     offset = int(request.args.get('from', 0))
     limit = int(request.args.get('show', 20))
 
