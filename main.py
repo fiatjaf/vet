@@ -9,6 +9,7 @@ import sqlite3
 from flask import Flask, request, render_template
 from sqlalchemy import Table, Column, Integer, String
 from sqlalchemy import create_engine, MetaData
+from utils import memoize
 
 app = Flask(__name__)
 app.debug = True
@@ -95,6 +96,14 @@ def jinja2globals():
         'tablenames': tablenames,
     }
 
+@app.template_filter('fk2name')
+@memoize
+def fk2name(id, table, column):
+    tablecolumn = getattr(table.c, column)
+    record = table.select(tablecolumn == id).execute().first()
+    namecolumn = tables[tablenames[table]]['name_column']
+    return getattr(record, namecolumn, id) # fallback on id
+
 conn = engine.connect()
 
 @app.route('/favicon.ico')
@@ -112,7 +121,11 @@ def get(table_name, id=None):
         pk = table.primary_key.columns.keys()[0]
     except IndexError:
         pk = None
-    fk = {k.parent.name: k.column.table for k in table.foreign_keys}
+    fk = {k.parent.name:  {
+            'table': k.column.table,
+            'column': k.column.name
+    } for k in table.foreign_keys}
+
     if id:
         o = table.select(getattr(table.c, pk) == id).execute().first()
         return render_template('entity.html',

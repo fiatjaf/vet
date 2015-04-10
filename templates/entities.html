@@ -21,7 +21,12 @@
       {% for item in row %}
         <td>
           {% if columns[loop.index0] in foreign_keys %}
-            <a href="/{{ tablenames[foreign_keys[columns[loop.index0]]] }}/{{ item }}">{{ item }}</a>
+            {% set foreign_key = foreign_keys[columns[loop.index0]] %}
+            {% set foreign_key_table = foreign_key.table %}
+            {% set foreign_key_column = foreign_key.column %}
+            <a href="/{{ tablenames[foreign_key_table] }}/{{ item }}">
+              {{ item | fk2name(table=foreign_key_table, column=foreign_key_column) }}
+            </a>
           {% else %}
             {{ item }}
           {% endif %}
