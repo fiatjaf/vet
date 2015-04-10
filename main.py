@@ -146,7 +146,23 @@ tables = {
     'sort_column': 'NomePaciente',
   },
 }
-tablenames = {v['table']: k for k, v in tables.items()}
+tablenames = {}
+for name, data in tables.items():
+    tablenames[data['table']] = name
+
+    try:
+        data['primary_key'] = data['table'].primary_key.columns.keys()[0]
+    except IndexError:
+        data['primary_key'] = None
+
+    data['foreign_keys'] = {
+        k.parent.name:  {
+            'table': k.column.table,
+            'column': k.column.name
+        } for k in data['table'].foreign_keys
+    }
+
+    
 
 @app.template_filter('fk2name')
 @memoize
@@ -171,13 +187,15 @@ def add_query_params(url, params):
     return urlparse.urlunparse(url_parts)
 
 def list_foreign_key(table, column):
+    tabledata = tables[tablenames[table]]
+
     query = table.select()
-    if 'sort_column' in tables[tablenames[table]]:
-        query = query.order_by(tables[tablenames[table]]['sort_column'])
+    if 'sort_column' in tabledata:
+        query = query.order_by(tabledata['sort_column'])
 
     for record in query.execute():
-        primary_key = table.primary_key.columns.keys()[0]
-        id = getattr(record, primary_key)
+        primary_key = tabledata['primary_key']
+        id = getattr(record, primary_key) if primary_key else None
         name = row2name(record, table)
         yield id, name
 
@@ -197,32 +215,24 @@ def nothing():
 @app.route('/<table_name>/<id>/', methods=['GET'])
 @app.route('/<table_name>/', methods=['GET'])
 def get(table_name, id=None):
-    table = tables[table_name]['table']
+    tabledata = tables[table_name]
+    table = tabledata['table']
     offset = int(request.args.get('from', 0))
     limit = int(request.args.get('show', 20))
 
-    try:
-        pk = table.primary_key.columns.keys()[0]
-    except IndexError:
-        pk = None
-    fk = {k.parent.name:  {
-            'table': k.column.table,
-            'column': k.column.name
-    } for k in table.foreign_keys}
-
     if id:
-        o = table.select(getattr(table.c, pk) == id).execute().first()
+        o = table.select(getattr(table.c, tabledata['primary_key']) == id).execute().first()
         return render_template('entity.html',
                                columns=table.columns,
                                data=o,
                                table=table,
                                table_name=table_name,
-                               primary_key=pk,
-                               foreign_keys=fk)
+                               primary_key=tabledata['primary_key'],
+                               foreign_keys=tabledata['foreign_keys'])
     else:
         query = table.select()
-        if 'sort_column' in tables[table_name]:
-            query = query.order_by(tables[table_name]['sort_column'])
+        if 'sort_column' in tabledata:
+            query = query.order_by(tabledata['sort_column'])
 
         r = query.offset(offset).limit(limit).execute().fetchall()
         return render_template('entities.html',
@@ -232,8 +242,8 @@ def get(table_name, id=None):
                                rows=r,
                                table=table,
                                table_name=table_name,
-                               primary_key=pk,
-                               foreign_keys=fk)
+                               primary_key=tabledata['primary_key'],
+                               foreign_keys=tabledata['foreign_keys'])
 
 @app.route('/')
 def index():
