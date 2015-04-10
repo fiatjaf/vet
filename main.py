@@ -59,6 +59,15 @@ tables = {
   'atendimento': Table('ATENDIMENTO', metadata, autoload=True),
   'paciente': Table('PACIENTE', metadata, autoload=True),
 }
+inverted_tables = {v: k for k, v in tables.items()}
+
+# jinja2 globals
+@app.context_processor
+def jinja2globals():
+    return {
+        'tables': tables,
+        'inverted_tables': inverted_tables,
+    }
 
 conn = engine.connect()
 
@@ -77,7 +86,7 @@ def get(table_name, id=None):
         pk = table.primary_key.columns.keys()[0]
     except IndexError:
         pk = None
-    fk = {}
+    fk = {k.parent.name: k.column.table for k in table.foreign_keys}
     if id:
         o = table.select(getattr(table.c, pk) == id).execute().first()
         return render_template('entity.html',

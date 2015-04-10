@@ -20,7 +20,11 @@
       </td>
       {% for item in row %}
         <td>
-          {{ item }}
+          {% if columns[loop.index0] in foreign_keys %}
+            <a href="/{{ inverted_tables[foreign_keys[columns[loop.index0]]] }}/{{ item }}">{{ item }}</a>
+          {% else %}
+            {{ item }}
+          {% endif %}
         </td>
       {% endfor %}
     </tr>
