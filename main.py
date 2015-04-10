@@ -12,8 +12,7 @@ from sqlalchemy import create_engine, MetaData
 app = Flask(__name__)
 app.debug = True
 
-print getattr(sys, 'frozen')
-if getattr(sys, 'frozen'):
+if getattr(sys, 'frozen', False):
     print sys.executable
     here = sys.executable
 else:
@@ -46,16 +45,6 @@ conn = engine.connect()
 def nothing():
     return ''
 
-@app.route('/<table_name>/<id>/', methods=['POST'])
-@app.route('/<table_name>/', methods=['POST'])
-def post(table_name, id=None):
-    table = tables[table_name]
-    if not id:
-        o = conn.execute(table.insert(), **request.form)
-    else:
-        o = conn.execute(table.update(), **request.form)
-    return render_template('raw.html', data=o)
-
 @app.route('/<table_name>/<id>/', methods=['GET'])
 @app.route('/<table_name>/', methods=['GET'])
 def get(table_name, id=None):
@@ -63,7 +52,10 @@ def get(table_name, id=None):
     offset = request.args.get('from', 0)
     limit = request.args.get('show', 20)
 
-    pk = table.primary_key.columns.keys()[0]
+    try:
+        pk = table.primary_key.columns.keys()[0]
+    except IndexError:
+        pk = None
     fk = {}
     if id:
         o = table.select(getattr(table.c, pk) == id).execute().first()
@@ -87,12 +79,15 @@ def index():
     return render_template('list.html', list=tables, name="Tabelas")
 
 if __name__ == '__main__':
-    import webbrowser
-    import threading
-    import random
+    if not getattr(sys, 'frozen', False):
+        app.run('0.0.0.0')
+    else:
+        import webbrowser
+        import threading
+        import random
 
-    port = 5000 + random.randint(0, 999)
-    url = 'http://127.0.0.1:%s' % port
+        port = 5000 + random.randint(0, 999)
+        url = 'http://127.0.0.1:%s' % port
 
-    threading.Timer(1.45, lambda: webbrowser.open(url)).start()
-    app.run(port=port, debug=False)
+        threading.Timer(1.45, lambda: webbrowser.open(url)).start()
+        app.run(port=port, debug=False)

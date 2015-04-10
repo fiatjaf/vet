@@ -6,14 +6,24 @@
 
 <table>
   <tr>
-    {% for name in columns %}<th>{{ name }}</th>{% endfor %}
+    <th></th>
+    {% for name in columns %}
+      <th>{{ name }}</th>
+    {% endfor %}
+  </tr>
     {% for row in rows %}
-      <tr>
+    <tr>
+      <td>
+        {% if primary_key %}
+        <a href="/{{ table_name }}/{{ row[columns.index(primary_key)] }}">VER</a>
+        {% endif %}
+      </td>
       {% for item in row %}
         <td>
-          <a href="/{{ table_name }}/{{ row[columns.index(primary_key)] }}">{{ item }}</a>
-        </td>{% endfor %}
-      </tr>
+          {{ item }}
+        </td>
+      {% endfor %}
+    </tr>
     {% endfor %}
   </tr>
 </table>
