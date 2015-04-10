@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 #!/usr/bin/env python
 
 import json
@@ -31,12 +32,32 @@ print engine.__dict__
 metadata = MetaData(bind=engine)
 
 tables = {
-  'cores': Table('COR', metadata, autoload=True),
-  'pacientes': Table('PACIENTE', metadata, autoload=True),
-  'clientes': Table('CLIENTE', metadata, autoload=True),
-  'atendimentos': Table('ATENDIMENTO', metadata, autoload=True),
-  'vacinas-aplicadas': Table('VACINA APLICADA', metadata, autoload=True),
-  'vacinas-agendadas': Table('VACINA PLANEJADA', metadata, autoload=True)
+  'categoria-produto': Table('CATEGORIA PRODUTO', metadata, autoload=True),
+  'cliente': Table('CLIENTE', metadata, autoload=True),
+  'cobranca': Table('COBRANCA', metadata, autoload=True),
+  'cor': Table('COR', metadata, autoload=True),
+  'diagnostico': Table('DIAGNOSTICO', metadata, autoload=True),
+  'distribuidor-produto': Table('DISTRIBUIDOR PRODUTO', metadata, autoload=True),
+  'doenca': Table('DOENCA', metadata, autoload=True),
+  'especie': Table('ESPECIE', metadata, autoload=True),
+  'fabricante-produto': Table('FABRICANTE PRODUTO', metadata, autoload=True),
+  'fabricante-vacina': Table('FABRICANTE VACINA', metadata, autoload=True),
+  'lixo1': Table('lixo1', metadata, autoload=True),
+  'movimento-produto': Table('MOVIMENTO PRODUTO', metadata, autoload=True),
+  'ocorrencia': Table('OCORRENCIA', metadata, autoload=True),
+  'produto': Table('PRODUTO', metadata, autoload=True),
+  'produto1': Table('PRODUTO1', metadata, autoload=True),
+  'propriedade-produto': Table('PROPRIEDADE PRODUTO', metadata, autoload=True),
+  'raca': Table('RACA', metadata, autoload=True),
+  'subdiagnostico': Table('SUBDIAGNOSTICO', metadata, autoload=True),
+  'tipo-movimento-produto': Table('TIPO MOVIMENTO PRODUTO', metadata, autoload=True),
+  'tipo-vacina': Table('TIPO VACINA', metadata, autoload=True),
+  'vacina-aplicada': Table('VACINA APLICADA', metadata, autoload=True),
+  'tipo-vacina-x-doenca': Table('TIPO VACINA x DOENCA', metadata, autoload=True),
+  'unidade': Table('UNIDADE', metadata, autoload=True),
+  'vacina-planejada': Table('VACINA PLANEJADA', metadata, autoload=True),
+  'atendimento': Table('ATENDIMENTO', metadata, autoload=True),
+  'paciente': Table('PACIENTE', metadata, autoload=True),
 }
 
 conn = engine.connect()

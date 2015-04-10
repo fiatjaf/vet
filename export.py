@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 import StringIO
 import datetime
 import subprocess
@@ -28,7 +30,13 @@ for table in tables:
         filelike = StringIO.StringIO(data)
         rows = csv.reader(filelike, delimiter=',', quotechar='"')
 
+        table = table.replace('Ç', 'C')
+
         cols = rows.next()
+        for i, col in enumerate(cols):
+            col = col.decode('utf-8').replace(u'ç', 'c').encode('utf-8')
+            cols[i] = col
+
         for row in rows:
             vals = []
             for val in row:

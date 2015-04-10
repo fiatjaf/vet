@@ -78,8 +78,8 @@ CREATE TABLE `DISTRIBUIDOR PRODUTO`
 
 CREATE TABLE `DOENCA`
  (
-	`CodigoDoença`			INTEGER PRIMARY KEY, 
-	`NomeDoença`			VARCHAR (60)
+	`CodigoDoenca`			INTEGER PRIMARY KEY, 
+	`NomeDoenca`			VARCHAR (60)
 );
 
 
@@ -203,7 +203,7 @@ CREATE TABLE `TIPO MOVIMENTO PRODUTO`
 CREATE TABLE `TIPO VACINA`
  (
 	`CodigoTipoVacina`			INTEGER PRIMARY KEY, 
-	`DescriçãoTipoVacina`			VARCHAR (100)
+	`DescricãoTipoVacina`			VARCHAR (100)
 );
 
 
@@ -219,9 +219,9 @@ CREATE TABLE `VACINA APLICADA`
 );
 
 
-CREATE TABLE `TIPO VACINA x DOENÇA`
+CREATE TABLE `TIPO VACINA x DOENCA`
  (
-	`CodigoDoença`			INTEGER REFERENCES DOENCA(`CodigoDoença`),
+	`CodigoDoenca`			INTEGER REFERENCES DOENCA(`CodigoDoenca`),
 	`CodigoTipoVacina`			INTEGER REFERENCES "TIPO VACINA"(CodigoTipoVacina)
 );
 
@@ -266,7 +266,7 @@ CREATE TABLE `PACIENTE`
 	`CausaFalecimentoPaciente`			DOUBLE PRECISION, 
 	`ClientePaciente`			INTEGER, 
 	`CadastramentoPaciente`			DATE, 
-	`ObservaçaoPaciente`			TEXT, 
+	`ObservacaoPaciente`			TEXT, 
 	`PedigreePaciente`			VARCHAR (2), 
 	`StatusPaciente`			VARCHAR (2), 
 	`NomePaciente`			VARCHAR (40), 
