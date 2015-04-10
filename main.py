@@ -70,8 +70,8 @@ def nothing():
 @app.route('/<table_name>/', methods=['GET'])
 def get(table_name, id=None):
     table = tables[table_name]
-    offset = request.args.get('from', 0)
-    limit = request.args.get('show', 20)
+    offset = int(request.args.get('from', 0))
+    limit = int(request.args.get('show', 20))
 
     try:
         pk = table.primary_key.columns.keys()[0]
@@ -89,6 +89,8 @@ def get(table_name, id=None):
     else:
         r = table.select().offset(offset).limit(limit).execute().fetchall()
         return render_template('entities.html',
+                               limit=limit,
+                               offset=offset,
                                columns=table.columns.keys(),
                                rows=r,
                                table_name=table_name,
