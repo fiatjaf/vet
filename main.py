@@ -198,6 +198,11 @@ def select(table, where=None):
 
     return tuple(query.execute())
 
+@app.template_filter('get_from')
+def get_from(id, table):
+    primary_key = tables[tablenames[table]]['primary_key']
+    return table.select(getattr(table.c, primary_key) == id).execute().first()
+
 @app.template_filter('add_query_params')
 def add_query_params(url, params):
     url_parts = list(urlparse.urlparse(url))
