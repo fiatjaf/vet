@@ -5,12 +5,15 @@
 <h1><a href="/">Início</a> / <a href="/{{ table_name }}/">{{ table_name | replace('-', ' ') | title }}</a></h1>
 
 <table>
-  <tr>
-    <th></th>
-    {% for name, column in columns.items() %}
-      <th>{{ name }}</th>
-    {% endfor %}
-  </tr>
+  <thead>
+    <tr>
+      <th></th>
+      {% for name, column in columns.items() %}
+        <th>{{ name }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
     {% for row in rows %}
     <tr>
       <td>
@@ -19,22 +22,23 @@
         {% endif %}
       </td>
       {% for item in row %}
-        <td>
-          {% if item and columns.keys()[loop.index0] in foreign_keys %}
+        {% set column_name = columns.keys()[loop.index0] %}
+
+        <td title="{{ column_name }}">
+          {% if item and column_name in foreign_keys %}
             {% set foreign_key = foreign_keys[columns.keys()[loop.index0]] %}
-            {% set foreign_key_table = foreign_key.table %}
-            {% set foreign_key_column = foreign_key.column %}
-            <a href="/{{ tablenames[foreign_key_table] }}/{{ item }}">
-              {{ item | fk2name(table=foreign_key_table, column=foreign_key_column) }}
+
+            <a href="/{{ tablenames[foreign_key.table] }}/{{ item }}">
+              {{ item | fk2name(table=foreign_key.table, column=foreign_key.column) }}
             </a>
           {% else %}
-            {{ item }}
+            {{ item or '' }}
           {% endif %}
         </td>
       {% endfor %}
     </tr>
     {% endfor %}
-  </tr>
+  </tbody>
 </table>
 
 <form method="get" action="{{ request.url | add_query_params({'from': offset + limit}) }}">

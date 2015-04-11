@@ -6,39 +6,40 @@
 
 <form method="post" action="/{{ table_name }}/{{ data[columns.keys().index(primary_key)] }}/">
   {% for item in data %}
-    <div>
+    <div class="row">
       {% set column_name = columns.keys()[loop.index0] %}
       {% set column = columns[column_name] %}
-      <label>{{ column_name }}:</label>
+      <label>
+        {{ column_name }}:
 
-      {% set foreign_key = foreign_keys.get(column_name) %}
-      {% if foreign_key and tables[tablenames[foreign_key.table]]['primary_key'] %}
-        <a target="_blank" href="/{{ tablenames[foreign_key.table] }}/{{ item }}/">
-          {{ item | get_from(foreign_key.table) | record2name(foreign_key.table) }}</a>
+        {% set foreign_key = foreign_keys.get(column_name) %}
+        {% if foreign_key and tables[tablenames[foreign_key.table]]['primary_key'] %}
+          <a target="_blank" href="/{{ tablenames[foreign_key.table] }}/{{ item }}/">
+            {{ item | get_from(foreign_key.table) | record2name(foreign_key.table) }}</a>
 
-        <select name="{{ column_name }}">
-          <option value="0"></option>
-          {% for record in foreign_key.table | select %}
-            {% set id = record | record2id(foreign_key.table) %}
-            <option value="{{ id }}"
-                    {% if item == id %}selected{% endif %}>
-              {{ record | record2name(foreign_key.table) }}
-            </option>
-          {% endfor %}
-        </select>
-      {% elif column.type.__visit_name__  == 'TEXT' %}
-        {% if not column.type.length or column.type.length > 100 %}
-          <textarea name="{{ column_name }}">{{ item }}</textarea>
+          <select name="{{ column_name }}">
+            <option value="0"></option>
+            {% for record in foreign_key.table | select %}
+              {% set id = record | record2id(foreign_key.table) %}
+              <option value="{{ id }}" {% if item == id %}selected{% endif %}>
+                {{ record | record2name(foreign_key.table) }}
+              </option>
+            {% endfor %}
+          </select>
+        {% elif column.type.__visit_name__  == 'TEXT' %}
+          {% if not column.type.length or column.type.length > 100 %}
+            <div class="row"><textarea name="{{ column_name }}">{{ item or '' }}</textarea></div>
+          {% else %}
+            <input name="{{ column_name }}"
+                   maxlength="{{ column.type.length }}"
+                   style="width: {{ (column.type.length * 8 ) + 8 }}px"
+                   value="{{ item or '' }}">
+          {% endif %}
         {% else %}
           <input name="{{ column_name }}"
-                 maxlength="{{ column.type.length }}"
-                 style="width: {{ (column.type.length * 8 ) + 8 }}px"
-                 value="{{ item }}">
+                 value="{{ item or '' }}">
         {% endif %}
-      {% else %}
-        <input name="{{ column_name }}"
-               value="{{ item }}">
-      {% endif %}
+      </label>
     </div>
   {% endfor %}
   <button type="submit">SALVAR</button>

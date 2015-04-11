@@ -284,7 +284,7 @@ def post(table_name, id):
 
 @app.route('/')
 def index():
-    return render_template('list.html', list=tables, name="Tabelas")
+    return render_template('index.html', tables=tables)
 
 if __name__ == '__main__':
     if not getattr(sys, 'frozen', False):

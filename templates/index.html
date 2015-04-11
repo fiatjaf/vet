@@ -2,9 +2,9 @@
 
 {% block body %}
 
-<h1>{{ name }}</h1>
+<h1>Tabelas</h1>
 <ul>
-{% for elem in list | sort %}
+{% for elem in tables | sort %}
   <li><a href="/{{ elem }}/">{{ elem }}</a></li>
 {% endfor %}
 </ul>
