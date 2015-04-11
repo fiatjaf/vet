@@ -14,17 +14,12 @@
 
         {% set foreign_key = foreign_keys.get(column_name) %}
         {% if foreign_key and tables[tablenames[foreign_key.table]]['primary_key'] %}
-          <a target="_blank" href="/{{ tablenames[foreign_key.table] }}/{{ item }}/">
-            {{ item | get_from(foreign_key.table) | record2name(foreign_key.table) }}</a>
 
-          <select name="{{ column_name }}">
-            <option value="0"></option>
-            {% for record in foreign_key.table | select %}
-              {% set id = record | record2id(foreign_key.table) %}
-              <option value="{{ id }}" {% if item == id %}selected{% endif %}>
-                {{ record | record2name(foreign_key.table) }}
-              </option>
-            {% endfor %}
+          {% set fkname = item | get_from(foreign_key.table) | record2name(foreign_key.table) %}
+          <a href="/{{ tablenames[foreign_key.table] }}/{{ item }}/">{{ fkname or '' }}</a>
+
+          <select name="{{ column_name }}" data-fk="{{ tablenames[foreign_key.table] }}">
+            <option value="{{ item or 0 }}" selected>{{ fkname or '' }}</option>
           </select>
         {% elif column.type.__visit_name__  == 'TEXT' %}
           {% if not column.type.length or column.type.length > 100 %}

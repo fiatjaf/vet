@@ -9,7 +9,7 @@ import sqlite3
 import urllib
 import urlparse
 
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, jsonify
 from sqlalchemy import Table, Column, Integer, String
 from sqlalchemy import create_engine, MetaData
 from utils import memoize
@@ -179,18 +179,21 @@ def fk2name(id, table, column):
 
 @app.template_filter('record2id')
 def record2id(record, table):
-    primary_key = tables[tablenames[table]]['primary_key']
+    tabledata = tables[tablenames[table]] if not isinstance(table, basestring) else tables[table]
+    primary_key = tabledata['primary_key']
     return getattr(record, primary_key, None)
 
 @app.template_filter('record2name')
 def record2name(record, table):
-    namecolumn = tables[tablenames[table]]['name_column']
+    tabledata = tables[tablenames[table]] if not isinstance(table, basestring) else tables[table]
+    namecolumn = tabledata['name_column']
     return getattr(record, namecolumn, None)
 
 @app.template_filter('select')
 @memoize
 def select(table, where=None):
-    tabledata = tables[tablenames[table]]
+    tabledata = tables[tablenames[table]] if not isinstance(table, basestring) else tables[table]
+    table = tabledata['table']
 
     query = table.select(where)
     if 'sort_column' in tabledata:
@@ -200,7 +203,9 @@ def select(table, where=None):
 
 @app.template_filter('get_from')
 def get_from(id, table):
-    primary_key = tables[tablenames[table]]['primary_key']
+    tabledata = tables[tablenames[table]] if not isinstance(table, basestring) else tables[table]
+    table = tabledata['table']
+    primary_key = tabledata['primary_key']
     return table.select(getattr(table.c, primary_key) == id).execute().first()
 
 @app.template_filter('add_query_params')
@@ -281,6 +286,16 @@ def post(table_name, id):
              .execute()
 
         return redirect(request.url)
+
+@app.route('/_/foreign-key-options/<table_name>/')
+def options_for_foreign_key(table_name):
+    options = [(
+        record2name(record, table_name) or '-',
+        record2id(record, table_name)
+    ) for record in select(table_name)]
+    response = jsonify({'options': options})
+    response.cache_control.max_age = 3600
+    return response
 
 @app.route('/')
 def index():

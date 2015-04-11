@@ -16,3 +16,11 @@ th, td {
 th {
   font-size: 0.9em;
 }
+.row > * {
+  vertical-align: middle !important;
+}
+
+textarea {
+  min-height: 150px;
+  min-width: 426px;
+}
