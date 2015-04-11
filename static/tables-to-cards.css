@@ -58,3 +58,7 @@ table td:before {
 table td:not(*[title]) {
   text-align: center;
 }
+
+table td[data-null] {
+  display: none;
+}

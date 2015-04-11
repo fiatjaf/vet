@@ -24,17 +24,21 @@
       {% for item in row %}
         {% set column_name = columns.keys()[loop.index0] %}
 
-        <td title="{{ column_name }}">
-          {% if item and column_name in foreign_keys %}
-            {% set foreign_key = foreign_keys[columns.keys()[loop.index0]] %}
+        {% if item %}
+          <td title="{{ column_name }}">
+            {% if column_name in foreign_keys %}
+              {% set foreign_key = foreign_keys[columns.keys()[loop.index0]] %}
 
-            <a href="/{{ tablenames[foreign_key.table] }}/{{ item }}">
-              {{ item | fk2name(table=foreign_key.table, column=foreign_key.column) }}
-            </a>
-          {% else %}
-            {{ item or '' }}
-          {% endif %}
-        </td>
+              <a href="/{{ tablenames[foreign_key.table] }}/{{ item }}/">
+                {{ item | fk2name(table=foreign_key.table, column=foreign_key.column) }}
+              </a>
+            {% else %}
+              {{ item }}
+            {% endif %}
+          </td>
+        {% else %}
+          <td data-null></td>
+        {% endif %}
       {% endfor %}
     </tr>
     {% endfor %}
